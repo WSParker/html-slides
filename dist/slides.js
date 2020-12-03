@@ -1,3 +1,16 @@
+var styleSheetInit = document.createElement("style");
+styleSheetInit.type = "text/css";
+styleSheetInit.innerText = `
+	html {visibility: hidden;}
+	#title,#author,#date {visibility: visible;}
+	`;
+document.head.appendChild(styleSheetInit);
+
+var mj = document.createElement("script");
+mj.setAttribute("src","https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML-full");
+mj.setAttribute("type","text/javascript");
+document.head.appendChild(mj);
+
 var styles = `
 	#title, #author, #date {
 		text-align: center;
@@ -18,6 +31,9 @@ styleSheet.type = "text/css";
 styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
 
+window.onload = function() {
+	document.head.removeChild(styleSheetInit);
+
 var currentSlide = 0;
 var slides = document.getElementsByClassName("slide");
 var currentAnimation = [];
@@ -26,7 +42,7 @@ for (var i = 0; i < slides.length; i++) {
 	slides[i].classList.add("hide");
 	var slideNum = document.createElement("P");
 	slideNum.innerHTML = String(i);
-	slideNum.style = "position: absolute; bottom: 20px; right: 40px; font-size:20px;"
+	slideNum.style = "position: absolute; bottom: 20px; right: 30px; font-size:20px;"
 	slides[i].appendChild(slideNum);
 }
 slides[0].classList.remove("hide");
@@ -142,4 +158,4 @@ window.addEventListener("keydown", function(e) {
 			decreaseSlide();
 		}
 	}
-})
+})}
