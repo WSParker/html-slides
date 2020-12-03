@@ -15,7 +15,7 @@ You can:
 
 ## Usage
 
-Include html-slides by adding ```<script src="https://cdn.jsdelivr.net/gh/WSParker/html-slides@main/dist/slides.js" type='text/javascript'></script>``` to the head of your HTML.
+Include html-slides by adding ```<script src="https://cdn.jsdelivr.net/gh/WSParker/html-slides@main/dist/slides.min.js" type='text/javascript'></script>``` to the head of your HTML.
 
 html-slides uses three classes: ```.slide```, ```.animate-stay```, and ```.animate-go```.
 
