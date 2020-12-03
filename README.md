@@ -20,8 +20,8 @@ Include html-slides by adding ```<script src="https://cdn.jsdelivr.net/gh/WSPark
 html-slides uses three classes: ```.slide```, ```.animate-stay```, and ```.animate-go```.
 
 1. ```class="slide"``` defines a slide. It will get its own slide number at the bottom right.
-2. ```class="animate-stay n"``` defines an element that will appear on the $n^{th}$ rightarrow (or spacebar) **after** its containing slide appears, and stay for the duration of the slide.
-3. <code>class="animate-go n<sub>1</sub> n<sub>2</sub> n<sub>3</sub>"</code> defines an element that will be visible for the $n_1^{th}$, $n_2^{th}$, and $n_3^{th}$ rightarrows **after** its containing slide appears, but will disappear after that.
+2. ```class="animate-stay n"``` defines an element that will appear on the n<sup>th</sup> rightarrow (or spacebar) **after** its containing slide appears, and stay for the duration of the slide.
+3. <code>class="animate-go n<sub>1</sub> n<sub>2</sub> n<sub>3</sub>"</code> defines an element that will be visible for the n<sub>1</sub><sup>th</sup>, n<sub>2</sub><sup>th</sup>, and n<sub>3</sub><sup>th</sup> rightarrows **after** its containing slide appears, but will disappear after that.
 
 Check out the [demo](demo/demo.html).
 
