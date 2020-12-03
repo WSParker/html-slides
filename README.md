@@ -11,7 +11,7 @@ You can:
 
 1. Display one slide at a time using right/left arrows and/or the spacebar.
 2. Display elements within each slide one at a time and have them stay for the rest of the slide or disappear.
-3. Use $\LaTeX$ via MathJax.
+3. Use \(\LaTeX\) via MathJax.
 
 ## Usage
 
