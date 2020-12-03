@@ -4,7 +4,7 @@ html-slides allows you to write html and have it present as a slideshow. I
 basically wrote it for personal use, and only made it public so I can use it from
 a CDN (via jsdelivr).
 
-That said, if you hate powerpoint with a passion, give it a shot. Usage is
+That said, if you ~~hate powerpoint with a passion~~ want to easily make slideshows in HTML and type equations in LaTeX, give it a try. Usage is
 simple, functionality is minimal.
 
 You can:
