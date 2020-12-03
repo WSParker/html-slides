@@ -23,7 +23,7 @@ html-slides uses three classes: ```.slide```, ```.animate-stay```, and ```.anima
 2. ```class="animate-stay n"``` defines an element that will appear on the n<sup>th</sup> rightarrow (or spacebar) **after** its containing slide appears, and stay for the duration of the slide.
 3. <code>class="animate-go n<sub>1</sub> n<sub>2</sub> n<sub>3</sub>"</code> defines an element that will be visible for the n<sub>1</sub><sup>th</sup>, n<sub>2</sub><sup>th</sup>, and n<sub>3</sub><sup>th</sup> rightarrows **after** its containing slide appears, but will disappear after that.
 
-Check out the demo, rendered [here](https://htmlpreview.github.io/?https://github.com/WSParker/html-slides/blob/main/demo/demo.html) and source code [here](demo/demo.html)
+Check out the demo [here](demo/demo.html).
 
 ## Gotchas
 
