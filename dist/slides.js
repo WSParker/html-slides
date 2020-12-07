@@ -2,7 +2,6 @@ var styleSheetInit = document.createElement("style");
 styleSheetInit.type = "text/css";
 styleSheetInit.innerText = `
 	html {visibility: hidden;}
-	#title,#author,#date {visibility: visible;}
 	`;
 document.head.appendChild(styleSheetInit);
 
@@ -35,8 +34,9 @@ window.onload = function() {
 	document.head.removeChild(styleSheetInit);
 
 	var currentSlide = 0;
-	var slides = document.getElementsByClassName("slide");
 	var currentAnimation = [];
+
+	var slides = document.getElementsByClassName("slide");
 	for (var i = 0; i < slides.length; i++) {
 		currentAnimation.push(0);
 		slides[i].classList.add("hide");
@@ -45,7 +45,16 @@ window.onload = function() {
 		slideNum.style = "position: absolute; bottom: 20px; right: 30px; font-size:20px;"
 		slides[i].appendChild(slideNum);
 	}
-	slides[0].classList.remove("hide");
+
+	if (!(localStorage.getItem("currentSlide") === null)) {
+		currentSlide = parseInt(localStorage.getItem("currentSlide"));
+	}
+	if (!(localStorage.getItem("currentAnimation") === null)) {
+		currentAnimation = JSON.parse(localStorage.getItem("currentAnimation"));
+		initializeNewSlide();
+	}
+
+	slides[currentSlide].classList.remove("hide");
 
 	function lastSlide() {
 		if (currentSlide + 1 < slides.length) {
@@ -90,10 +99,23 @@ window.onload = function() {
 		slides[currentSlide].classList.add("hide");
 		currentSlide += 1;
 		slides[currentSlide].classList.remove("hide");
-		var animations = slides[currentSlide].querySelectorAll(".animate-go, .animate-stay");
-		for (var i = 0; i < animations.length; i++) {
-			if (!animations[i].classList.contains("0")) {
-				animations[i].classList.add("hide");
+		initializeNewSlide();
+	}
+
+	function initializeNewSlide() {
+		var goAnimations = slides[currentSlide].querySelectorAll(".animate-go");
+		var stayAnimations = slides[currentSlide].querySelectorAll(".animate-stay");
+		for (var i = 0; i < goAnimations.length; i++) {
+			if (!goAnimations[i].classList.contains(String(currentAnimation[currentSlide]))) {
+				goAnimations[i].classList.add("hide");
+			}
+		}
+		for (var i = 0; i < stayAnimations.length; i++) {
+			stayAnimations[i].classList.add("hide");
+			for (var j = 0; j < currentAnimation[currentSlide] + 1; j++) {
+				if (stayAnimations[i].classList.contains(String(j))) {
+					stayAnimations[i].classList.remove("hide");
+				}
 			}
 		}
 	}
@@ -158,5 +180,7 @@ window.onload = function() {
 				decreaseSlide();
 			}
 		}
+		localStorage.setItem("currentSlide", currentSlide);
+		localStorage.setItem("currentAnimation", JSON.stringify(currentAnimation));
 	})
 }
