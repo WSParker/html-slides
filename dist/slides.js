@@ -46,13 +46,13 @@ window.onload = function() {
 	}
 
 	function storeState() {
-		localStorage.setItem("currentSlide", currentSlide);
-		localStorage.setItem("currentAnimation", JSON.stringify(currentAnimation));
+		sessionStorage.setItem("currentSlide", currentSlide);
+		sessionStorage.setItem("currentAnimation", JSON.stringify(currentAnimation));
 	}
 
 	function loadState() {
-		var oldCurrentSlide = parseInt(localStorage.getItem("currentSlide"));
-		var oldCurrentAnimation = JSON.parse(localStorage.getItem("currentAnimation"));
+		var oldCurrentSlide = parseInt(sessionStorage.getItem("currentSlide"));
+		var oldCurrentAnimation = JSON.parse(sessionStorage.getItem("currentAnimation"));
 		if (!(oldCurrentSlide === null) && !(oldCurrentAnimation === null)) {
 			currentSlide = mergeSlides(oldCurrentSlide);
 			currentAnimation = maxOutAnimations(currentSlide);
