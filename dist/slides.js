@@ -50,7 +50,9 @@ window.onload = function() {
 		currentSlide = parseInt(localStorage.getItem("currentSlide"));
 	}
 	if (!(localStorage.getItem("currentAnimation") === null)) {
-		currentAnimation = JSON.parse(localStorage.getItem("currentAnimation"));
+		if (JSON.parse(localStorage.getItem("currentAnimation")).length === slides.length) {
+			currentAnimation = JSON.parse(localStorage.getItem("currentAnimation"));
+		}
 		initializeNewSlide();
 	}
 
