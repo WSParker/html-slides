@@ -35,7 +35,6 @@ window.onload = function() {
 
 	var currentSlide = 0;
 	var currentAnimation = [];
-
 	var slides = document.getElementsByClassName("slide");
 	for (var i = 0; i < slides.length; i++) {
 		currentAnimation.push(0);
@@ -46,143 +45,149 @@ window.onload = function() {
 		slides[i].appendChild(slideNum);
 	}
 
-	if (!(localStorage.getItem("currentSlide") === null)) {
-		currentSlide = parseInt(localStorage.getItem("currentSlide"));
-	}
-	if (!(localStorage.getItem("currentAnimation") === null)) {
-		if (JSON.parse(localStorage.getItem("currentAnimation")).length === slides.length) {
-			currentAnimation = JSON.parse(localStorage.getItem("currentAnimation"));
-		}
-		initializeNewSlide();
+	function storeState() {
+		localStorage.setItem("currentSlide", currentSlide);
+		localStorage.setItem("currentAnimation", JSON.stringify(currentAnimation));
 	}
 
-	slides[currentSlide].classList.remove("hide");
-
-	function lastSlide() {
-		if (currentSlide + 1 < slides.length) {
-			return (false);
-		}
-		return (true);
-	}
-
-	function firstSlide() {
-		if (currentSlide > 0) {
-			return (false);
-		}
-		return (true);
-	}
-
-	function hasAnimations() {
-		if (slides[currentSlide].querySelectorAll(".animate-go, .animate-stay").length > 0) {
-			return (true);
-		} else {
-			return (false);
+	function loadState() {
+		var oldCurrentSlide = parseInt(localStorage.getItem("currentSlide"));
+		var oldCurrentAnimation = JSON.parse(localStorage.getItem("currentAnimation"));
+		if (!(oldCurrentSlide === null) && !(oldCurrentAnimation === null)) {
+			currentSlide = mergeSlides(oldCurrentSlide);
+			currentAnimation = maxOutAnimations(currentSlide);
 		}
 	}
 
-	function lastAnimation() {
-		var animations = slides[currentSlide].querySelectorAll(".animate-go, .animate-stay");
-		for (var i = 0; i < animations.length; i++) {
-			if (animations[i].classList.contains(String(currentAnimation[currentSlide] + 1))) {
-				return (false);
+	function mergeSlides(oldCurrentSlide) {
+		var outval = 0;
+		if (oldCurrentSlide + 1 > slides.length) {
+			return (slides.length - 1)
+		}
+		return (oldCurrentSlide);
+	}
+
+	function maxOutAnimations(slideNum) {
+		var test = currentAnimation;
+		for (var i = 0; i < slideNum + 1; i++) {
+			test[i] = findMaxAnimations(i);
+		}
+		return (test)
+	}
+
+	function findMaxAnimations(slideNum) {
+		var maxAnimation = 0;
+		while (checkForForwardAnimation(slideNum, maxAnimation)) {
+			maxAnimation += 1;
+		}
+		return (maxAnimation);
+	}
+
+	/////////////////////////////////////////////////////////////////////////
+	function showCurrentState() {
+		selectSlide(currentSlide);
+		selectAnimation(currentSlide, currentAnimation[currentSlide]);
+		storeState();
+	}
+
+	function selectSlide(slideNum) {
+		for (var i = 0; i < slides.length; i++) {
+			slides[i].classList.add("hide");
+		}
+		slides[slideNum].classList.remove("hide");
+	}
+
+	function selectAnimation(slideNum, animationNum) {
+		var goAn = slides[slideNum].getElementsByClassName("animate-go");
+		for (var i = 0; i < goAn.length; i++) {
+			if (goAn[i].classList.contains(String(animationNum))) {
+				goAn[i].classList.remove("hide");
+			} else {
+				goAn[i].classList.add("hide");
 			}
 		}
-		return (true);
-	}
 
-	function firstAnimation() {
-		if (currentAnimation[currentSlide] > 0) {
-			return (false);
-		}
-		return (true);
-	}
-
-	function increaseSlide() {
-		slides[currentSlide].classList.add("hide");
-		currentSlide += 1;
-		slides[currentSlide].classList.remove("hide");
-		initializeNewSlide();
-	}
-
-	function initializeNewSlide() {
-		var goAnimations = slides[currentSlide].querySelectorAll(".animate-go");
-		var stayAnimations = slides[currentSlide].querySelectorAll(".animate-stay");
-		for (var i = 0; i < goAnimations.length; i++) {
-			if (!goAnimations[i].classList.contains(String(currentAnimation[currentSlide]))) {
-				goAnimations[i].classList.add("hide");
-			}
-		}
-		for (var i = 0; i < stayAnimations.length; i++) {
-			stayAnimations[i].classList.add("hide");
-			for (var j = 0; j < currentAnimation[currentSlide] + 1; j++) {
-				if (stayAnimations[i].classList.contains(String(j))) {
-					stayAnimations[i].classList.remove("hide");
+		var stayAn = slides[slideNum].getElementsByClassName("animate-stay");
+		for (var i = 0; i < stayAn.length; i++) {
+			stayAn[i].classList.add("hide");
+			for (var j = 0; j < animationNum + 1; j++) {
+				if (stayAn[i].classList.contains(String(j))) {
+					stayAn[i].classList.remove("hide");
 				}
 			}
 		}
 	}
 
-	function decreaseSlide() {
-		slides[currentSlide].classList.add("hide");
-		currentSlide -= 1;
-		slides[currentSlide].classList.remove("hide");
-	}
-
-	function decreaseAnimation() {
-		var animateGo = slides[currentSlide].getElementsByClassName("animate-go " + String(currentAnimation[currentSlide]));
-		var animateStay = slides[currentSlide].getElementsByClassName("animate-stay " + String(currentAnimation[currentSlide]));
-		for (var i = 0; i < animateGo.length; i++) {
-			animateGo[i].classList.add("hide");
-		}
-		for (var i = 0; i < animateStay.length; i++) {
-			animateStay[i].classList.add("hide");
-		}
-		currentAnimation[currentSlide] -= 1;
-		animateGo = slides[currentSlide].getElementsByClassName("animate-go " + String(currentAnimation[currentSlide]));
-		for (var i = 0; i < animateGo.length; i++) {
-			animateGo[i].classList.remove("hide");
+	function moveForwardOne() {
+		var moreAnimations = checkForForwardAnimation(currentSlide, currentAnimation[currentSlide]);
+		var moreSlides = checkForForwardSlide(currentSlide);
+		if (moreAnimations) {
+			currentAnimation[currentSlide] += 1;
+			showCurrentState(currentSlide, currentAnimation[currentSlide]);
+		} else if (moreSlides) {
+			currentSlide += 1;
+			showCurrentState(currentSlide, currentAnimation[currentSlide]);
 		}
 	}
 
-	function increaseAnimation() {
-		var animateGo = slides[currentSlide].getElementsByClassName("animate-go " + String(currentAnimation[currentSlide]));
-		for (var i = 0; i < animateGo.length; i++) {
-			animateGo[i].classList.add("hide");
+	function checkForForwardAnimation(slideNum, animationNum) {
+		var goAn = slides[slideNum].getElementsByClassName("animate-go");
+		var stayAn = slides[slideNum].getElementsByClassName("animate-stay");
+		for (var i = 0; i < goAn.length; i++) {
+			if (goAn[i].classList.contains(String(animationNum + 1))) {
+				return (true);
+			}
 		}
-		currentAnimation[currentSlide] += 1;
-		animateGo = slides[currentSlide].getElementsByClassName("animate-go " + String(currentAnimation[currentSlide]));
-		var animateStay = slides[currentSlide].getElementsByClassName("animate-stay " + String(currentAnimation[currentSlide]));
-		for (var i = 0; i < animateGo.length; i++) {
-			animateGo[i].classList.remove("hide");
+		for (var i = 0; i < stayAn.length; i++) {
+			if (stayAn[i].classList.contains(String(animationNum + 1))) {
+				return (true);
+			}
 		}
-		for (var i = 0; i < animateStay.length; i++) {
-			animateStay[i].classList.remove("hide");
+		return (false);
+	}
+
+	function checkForForwardSlide(slideNum) {
+		if ((slideNum + 1) < slides.length) {
+			return (true);
 		}
+		return (false);
+	}
+
+	function moveBackOne() {
+		var moreAnimations = checkForBackAnimation(currentSlide, currentAnimation[currentSlide]);
+		var moreSlides = checkForBackSlide(currentSlide);
+		if (moreAnimations) {
+			currentAnimation[currentSlide] -= 1;
+			showCurrentState(currentSlide, currentAnimation[currentSlide]);
+		} else if (moreSlides) {
+			currentSlide -= 1;
+			showCurrentState(currentSlide, currentAnimation[currentSlide]);
+		}
+	}
+
+	function checkForBackAnimation(slideNum, animationNum) {
+		if ((animationNum) > 0) {
+			return (true);
+		}
+		return (false);
+	}
+
+	function checkForBackSlide(slideNum) {
+		if ((slideNum) > 0) {
+			return (true);
+		}
+		return (false);
 	}
 
 	window.addEventListener("keydown", function(e) {
-		if ((e.keyCode === 39) || (e.keyCode === 32)) {
-			if (hasAnimations()) {
-				if (!lastAnimation()) {
-					increaseAnimation();
-				} else if (!lastSlide()) {
-					increaseSlide();
-				}
-			} else if (!lastSlide()) {
-				increaseSlide();
-			}
+		if (e.keyCode === 39) {
+			moveForwardOne();
 		} else if (e.keyCode === 37) {
-			if (hasAnimations()) {
-				if (!firstAnimation()) {
-					decreaseAnimation();
-				} else if (!firstSlide()) {
-					decreaseSlide();
-				}
-			} else if (!firstSlide()) {
-				decreaseSlide();
-			}
+			moveBackOne();
 		}
-		localStorage.setItem("currentSlide", currentSlide);
-		localStorage.setItem("currentAnimation", JSON.stringify(currentAnimation));
 	})
+
+	loadState();
+
+	showCurrentState();
 }
