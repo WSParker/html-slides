@@ -55,7 +55,7 @@ window.onload = function() {
 		var oldCurrentAnimation = JSON.parse(sessionStorage.getItem("currentAnimation"));
 		if (!(oldCurrentSlide === null) && !(oldCurrentAnimation === null)) {
 			currentSlide = mergeSlides(oldCurrentSlide);
-			currentAnimation = maxOutAnimations(currentSlide);
+			currentAnimation = maxOutAnimations(currentSlide, oldCurrentAnimation);
 		}
 	}
 
@@ -67,10 +67,13 @@ window.onload = function() {
 		return (oldCurrentSlide);
 	}
 
-	function maxOutAnimations(slideNum) {
+	function maxOutAnimations(slideNum, oldCurrentAnimation) {
 		var test = currentAnimation;
-		for (var i = 0; i < slideNum + 1; i++) {
+		for (var i = 0; i < slideNum; i++) {
 			test[i] = findMaxAnimations(i);
+		}
+		if (!(oldCurrentAnimation[slideNum] === undefined)) {
+			test[slideNum] = Math.min(oldCurrentAnimation[slideNum], findMaxAnimations(slideNum));
 		}
 		return (test)
 	}
