@@ -11,17 +11,42 @@ mj.setAttribute("type", "text/javascript");
 document.head.appendChild(mj);
 
 var styles = `
+	body {
+		font-size: calc(.25 * min(16vh, 9vw));
+		overflow: hidden;
+		padding: 0px;
+		margin: 0px;
+		height: 100vh;
+		width: 100vw;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: black;
+	}
 	#title, #author, #date {
 		text-align: center;
 	}
-	#title {
-		padding-top: 100px;
-	}
 	.slide {
-		margin: 60px;
+		position: relative;
+		padding: 0em 2em;
+		box-sizing: border-box;
+		width: calc(1600vh / 9);
+		height: calc(900vw / 16);
+		max-height: 100vh;
+		max-width: 100vw;
+		background-color: white;
+	}
+	img {
+		width: 20em;
 	}
 	.hide {
 		display: none;
+	}
+	.slide-number {
+		position: absolute;
+		bottom: 0;
+		right: 1.5em;
+		text-align: right;
 	}
 `;
 
@@ -41,8 +66,8 @@ window.onload = function() {
 		slides[i].classList.add("hide");
 		var slideNum = document.createElement("P");
 		slideNum.innerHTML = String(i);
-		slideNum.style = "position: absolute; bottom: 20px; right: 30px; font-size:20px;"
 		slides[i].appendChild(slideNum);
+		slideNum.classList.add("slide-number");
 	}
 
 	function storeState() {
