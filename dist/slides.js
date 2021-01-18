@@ -126,7 +126,7 @@ window.onload = function() {
 	}
 
 	function selectAnimation(slideNum, animationNum) {
-		var goAn = slides[slideNum].querySelectorAll('[class^="ag-"]');
+		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
 		for (var i = 0; i < goAn.length; i++) {
 			if (goAnClassListContains(goAn[i],animationNum)) {
 				goAn[i].classList.remove("hide");
@@ -135,11 +135,11 @@ window.onload = function() {
 			}
 		}
 
-		var stayAn = slides[slideNum].querySelectorAll('[class^="as-"]');
+		var stayAn = slides[slideNum].querySelectorAll(`[class*="as-"]`);
 		for (var i = 0; i < stayAn.length; i++) {
 			stayAn[i].classList.add("hide");
 			for (var j = 0; j < animationNum + 1; j++) {
-				if (stayAn[i].classList.contains('as-'+String(j))) {
+				if (stayAn[i].classList.contains("as-"+String(j))) {
 					stayAn[i].classList.remove("hide");
 				}
 			}
@@ -171,8 +171,8 @@ window.onload = function() {
 	}
 
 	function checkForForwardAnimation(slideNum, animationNum) {
-		var goAn = slides[slideNum].querySelectorAll('[class^="ag-"]');
-		var stayAn = slides[slideNum].querySelectorAll('[class^="as-"]');
+		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
+		var stayAn = slides[slideNum].querySelectorAll(`[class*="as-"]`);
 		for (var i = 0; i < goAn.length; i++) {
 			if (goAnClassListContains(goAn[i], animationNum + 1)) {
 				return (true);
