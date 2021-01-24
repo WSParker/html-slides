@@ -128,7 +128,7 @@ window.onload = function() {
 	function selectAnimation(slideNum, animationNum) {
 		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
 		for (var i = 0; i < goAn.length; i++) {
-			if (goAnClassListContains(goAn[i],animationNum)) {
+			if (agClassListContains(goAn[i].classList,animationNum)) {
 				goAn[i].classList.remove("hide");
 			} else {
 				goAn[i].classList.add("hide");
@@ -139,11 +139,31 @@ window.onload = function() {
 		for (var i = 0; i < stayAn.length; i++) {
 			stayAn[i].classList.add("hide");
 			for (var j = 0; j < animationNum + 1; j++) {
-				if (stayAn[i].classList.contains("as-"+String(j))) {
+				if (asClassListContains(stayAn[i].classList, j)) {
 					stayAn[i].classList.remove("hide");
 				}
 			}
 		}
+	}
+
+	function agClassListContains(classList, number) {
+		var expr = new RegExp(`^ag(-[0-9]+)*-${number}((-[0-9]*)|$)+`);
+		for (var i = 0; i < classList.length; i++) {
+			if (expr.test(classList[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function asClassListContains(classList, number) {
+		var expr = new RegExp(`^as-${ number }$`);
+		for (var i = 0; i < classList.length; i++) {
+			if (expr.test(classList[i])) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	function moveForwardOne() {
@@ -158,28 +178,28 @@ window.onload = function() {
 		}
 	}
 
-	function goAnClassListContains(goAn, animationNum) {
-		var cl = goAn.classList;
-		for (var i = 0; i < cl.length; i++) {
-			if (cl[i].slice(0,2) == 'ag') {
-				if (cl[i].includes('-'+String(animationNum))) {
-					return(true);
-				}
-			}
-		}
-		return(false);
-	}
+	// function goAnClassListContains(goAn, animationNum) {
+	// 	var cl = goAn.classList;
+	// 	for (var i = 0; i < cl.length; i++) {
+	// 		if (cl[i].slice(0,2) == 'ag') {
+	// 			if (cl[i].includes('-'+String(animationNum))) {
+	// 				return(true);
+	// 			}
+	// 		}
+	// 	}
+	// 	return(false);
+	// }
 
 	function checkForForwardAnimation(slideNum, animationNum) {
 		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
 		var stayAn = slides[slideNum].querySelectorAll(`[class*="as-"]`);
 		for (var i = 0; i < goAn.length; i++) {
-			if (goAnClassListContains(goAn[i], animationNum + 1)) {
+			if (agClassListContains(goAn[i].classList, animationNum + 1)) {
 				return (true);
 			}
 		}
 		for (var i = 0; i < stayAn.length; i++) {
-			if (stayAn[i].classList.contains('as-'+String(animationNum + 1))) {
+			if (asClassListContains(stayAn[i].classList,animationNum + 1)) {
 				return (true);
 			}
 		}
