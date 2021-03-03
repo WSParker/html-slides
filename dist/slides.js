@@ -5,11 +5,6 @@ styleSheetInit.innerText = `
 	`;
 document.head.appendChild(styleSheetInit);
 
-var mj = document.createElement("script");
-mj.setAttribute("src", "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML-full");
-mj.setAttribute("type", "text/javascript");
-document.head.appendChild(mj);
-
 var styles = `
 	body {
 		font-size: calc(.25 * min(16vh, 9vw));
@@ -177,18 +172,6 @@ window.onload = function() {
 			showCurrentState(currentSlide, currentAnimation[currentSlide]);
 		}
 	}
-
-	// function goAnClassListContains(goAn, animationNum) {
-	// 	var cl = goAn.classList;
-	// 	for (var i = 0; i < cl.length; i++) {
-	// 		if (cl[i].slice(0,2) == 'ag') {
-	// 			if (cl[i].includes('-'+String(animationNum))) {
-	// 				return(true);
-	// 			}
-	// 		}
-	// 	}
-	// 	return(false);
-	// }
 
 	function checkForForwardAnimation(slideNum, animationNum) {
 		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
