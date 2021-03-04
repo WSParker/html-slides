@@ -18,9 +18,6 @@ var styles = `
 		align-items: center;
 		background-color: black;
 	}
-	#title, #author, #date {
-		text-align: center;
-	}
 	.slide {
 		position: relative;
 		padding: 0em 2em;
@@ -30,9 +27,6 @@ var styles = `
 		max-height: 100vh;
 		max-width: 100vw;
 		background-color: white;
-	}
-	img {
-		width: 20em;
 	}
 	.hide {
 		display: none;
