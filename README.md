@@ -9,8 +9,10 @@ simple, functionality is minimal.
 
 You can:
 
-1. Display one slide at a time using right/left arrows.
-2. Display elements within each slide one at a time and have them stay for the rest of the slide or disappear.
+1. Move forward and back using the right/left arrow keys.
+	* This cycles through the elements on each slide, then moves to the next slide.
+	* If you hold the arrow key down, it will cycle through the elements on each slide, but stop before proceeding to the next slide. 
+	* To cycle through elements AND slides without stopping, hold the shift key down.
 
 ## Usage
 

@@ -47,6 +47,9 @@ document.head.appendChild(styleSheet);
 window.onload = function() {
 	document.head.removeChild(styleSheetInit);
 
+	var lkeydown = false;
+	var rkeydown = false;
+
 	var currentSlide = 0;
 	var currentAnimation = [];
 	var slides = document.getElementsByClassName("slide");
@@ -155,13 +158,13 @@ window.onload = function() {
 		return false;
 	}
 
-	function moveForwardOne() {
+	function moveForwardOne(rkeydown) {
 		var moreAnimations = checkForForwardAnimation(currentSlide, currentAnimation[currentSlide]);
 		var moreSlides = checkForForwardSlide(currentSlide);
 		if (moreAnimations) {
 			currentAnimation[currentSlide] += 1;
 			showCurrentState(currentSlide, currentAnimation[currentSlide]);
-		} else if (moreSlides) {
+		} else if ((moreSlides)&&(!rkeydown)) {
 			currentSlide += 1;
 			showCurrentState(currentSlide, currentAnimation[currentSlide]);
 		}
@@ -190,13 +193,13 @@ window.onload = function() {
 		return (false);
 	}
 
-	function moveBackOne() {
+	function moveBackOne(lkeydown) {
 		var moreAnimations = checkForBackAnimation(currentSlide, currentAnimation[currentSlide]);
 		var moreSlides = checkForBackSlide(currentSlide);
 		if (moreAnimations) {
 			currentAnimation[currentSlide] -= 1;
 			showCurrentState(currentSlide, currentAnimation[currentSlide]);
-		} else if (moreSlides) {
+		} else if ((moreSlides)&&(!lkeydown)) {
 			currentSlide -= 1;
 			showCurrentState(currentSlide, currentAnimation[currentSlide]);
 		}
@@ -217,10 +220,24 @@ window.onload = function() {
 	}
 
 	window.addEventListener("keydown", function(e) {
-		if (e.keyCode === 39) {
-			moveForwardOne();
+		if (e.keyCode == 39) {
+			moveForwardOne(rkeydown);
+			if (!e.shiftKey) {
+				rkeydown = true;
+			}
 		} else if (e.keyCode === 37) {
-			moveBackOne();
+			moveBackOne(lkeydown);
+			if (!e.shiftKey) {
+				lkeydown = true
+			}
+		}
+	})
+
+	window.addEventListener("keyup", function(e) {
+		if (e.keyCode == 39) {
+			rkeydown = false;
+		} else if (e.keyCode == 37) {
+			lkeydown = false;
 		}
 	})
 
