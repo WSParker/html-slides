@@ -1,7 +1,9 @@
 var styleSheetInit = document.createElement("style");
 styleSheetInit.type = "text/css";
 styleSheetInit.innerText = `
-	html {visibility: hidden;}
+	html {
+		visibility: hidden;
+	}
 	`;
 document.head.appendChild(styleSheetInit);
 
@@ -39,27 +41,12 @@ var styles = `
 	}
 `;
 
-var styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
-styleSheet.innerText = styles;
-document.head.appendChild(styleSheet);
-
 window.onload = function() {
-	document.head.removeChild(styleSheetInit);
-
-	var lkeydown = false;
-	var rkeydown = false;
-
-	var currentSlide = 0;
-	var currentAnimation = [];
-	var slides = document.getElementsByClassName("slide");
-	for (var i = 0; i < slides.length; i++) {
-		currentAnimation.push(0);
-		slides[i].classList.add("hide");
-		var slideNum = document.createElement("P");
-		slideNum.innerHTML = String(i);
-		slides[i].appendChild(slideNum);
-		slideNum.classList.add("slide-number");
+	function preDecodeImages() {
+		var imgs = document.getElementsByTagName("img");
+		for (var i = 0; i < imgs.length; i++) {
+			imgs[i].decode();
+		}
 	}
 
 	function storeState() {
@@ -219,6 +206,32 @@ window.onload = function() {
 		return (false);
 	}
 
+	function setStyles() {
+		var styleSheet = document.createElement("style");
+		styleSheet.type = "text/css";
+		styleSheet.innerText = styles;
+		document.head.appendChild(styleSheet);
+
+		document.body.style.visibility = 'visible';
+	}
+
+	function makeSlideNums() {
+		for (var i = 0; i < slides.length; i++) {
+			currentAnimation.push(0);
+			var slideNum = document.createElement("P");
+			slideNum.innerHTML = String(i);
+			slides[i].appendChild(slideNum);
+			slideNum.classList.add("slide-number");
+		}
+	}
+
+	var lkeydown = false;
+	var rkeydown = false;
+
+	var currentSlide = 0;
+	var currentAnimation = [];
+	var slides = document.getElementsByClassName("slide");
+
 	window.addEventListener("keydown", function(e) {
 		if (e.keyCode == 39) {
 			moveForwardOne(rkeydown);
@@ -240,6 +253,12 @@ window.onload = function() {
 			lkeydown = false;
 		}
 	})
+
+	preDecodeImages();
+
+	makeSlideNums();
+
+	setStyles();
 
 	loadState();
 
