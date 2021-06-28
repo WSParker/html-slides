@@ -7,6 +7,18 @@ styleSheetInit.innerText = `
 	`;
 document.head.appendChild(styleSheetInit);
 
+
+/**
+ * Element.requestFullScreen() polyfill
+ * @author Chris Ferdinandi
+ * @license MIT
+ */
+if (!Element.prototype.requestFullscreen) {
+	Element.prototype.requestFullscreen = Element.prototype.mozRequestFullscreen || Element.prototype.webkitRequestFullscreen || Element.prototype.msRequestFullscreen;
+}
+/// End licensed material
+
+
 var styles = `
 	body {
 		font-size: calc(.25 * min(16vh, 9vw));
@@ -42,8 +54,8 @@ var styles = `
 `;
 
 window.onload = function() {
-	function preDecodeImages() {
-		var imgs = document.getElementsByTagName("img");
+	function preDecodeImages(slideNum) {
+		var imgs = slides[slideNum].getElementsByTagName("img");
 		for (var i = 0; i < imgs.length; i++) {
 			imgs[i].decode();
 		}
@@ -104,8 +116,14 @@ window.onload = function() {
 		slides[slideNum].classList.remove("hide");
 	}
 
-	function selectAnimation(slideNum, animationNum) {
+	async function selectAnimation(slideNum, animationNum) {
 		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
+		var imgs = slides[slideNum].querySelectorAll(`img[class*="ag-"]`);
+		for (var i = 0; i < imgs.length; i++) {
+			if (agClassListContains(imgs[i].classList, animationNum)) {
+				await imgs[i].decode();
+			}
+		}
 		for (var i = 0; i < goAn.length; i++) {
 			if (agClassListContains(goAn[i].classList,animationNum)) {
 				goAn[i].classList.remove("hide");
@@ -215,7 +233,7 @@ window.onload = function() {
 		document.body.style.visibility = 'visible';
 	}
 
-	function makeSlideNums() {
+	function makeSlideNums(slides) {
 		for (var i = 0; i < slides.length; i++) {
 			currentAnimation.push(0);
 			var slideNum = document.createElement("P");
@@ -233,16 +251,22 @@ window.onload = function() {
 	var slides = document.getElementsByClassName("slide");
 
 	window.addEventListener("keydown", function(e) {
-		if (e.keyCode == 39) {
-			moveForwardOne(rkeydown);
-			if (!e.shiftKey) {
-				rkeydown = true;
-			}
-		} else if (e.keyCode === 37) {
-			moveBackOne(lkeydown);
-			if (!e.shiftKey) {
-				lkeydown = true
-			}
+		switch(e.code) {
+			case "ArrowRight":
+				moveForwardOne(rkeydown);
+				if (!e.shiftKey) {
+					rkeydown = true;
+				};
+				break;
+			case "ArrowLeft":
+				moveBackOne(lkeydown);
+				if (!e.shiftKey) {
+					lkeydown = true
+				};
+				break;
+			case "KeyF":
+				document.documentElement.requestFullscreen();
+				break;
 		}
 	})
 
@@ -254,9 +278,7 @@ window.onload = function() {
 		}
 	})
 
-	preDecodeImages();
-
-	makeSlideNums();
+	makeSlideNums(slides);
 
 	setStyles();
 
