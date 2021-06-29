@@ -54,10 +54,10 @@ var styles = `
 `;
 
 window.onload = function() {
-	function preDecodeImages(slideNum) {
-		var imgs = slides[slideNum].getElementsByTagName("img");
+	async function preDecodeImages() {
+		var imgs = document.getElementsByTagName("IMG");
 		for (var i = 0; i < imgs.length; i++) {
-			imgs[i].decode();
+			await imgs[i].decode();
 		}
 	}
 
@@ -104,8 +104,8 @@ window.onload = function() {
 
 	/////////////////////////////////////////////////////////////////////////
 	function showCurrentState() {
-		selectSlide(currentSlide);
 		selectAnimation(currentSlide, currentAnimation[currentSlide]);
+		selectSlide(currentSlide);
 		storeState();
 	}
 
@@ -116,16 +116,10 @@ window.onload = function() {
 		slides[slideNum].classList.remove("hide");
 	}
 
-	async function selectAnimation(slideNum, animationNum) {
+	function selectAnimation(slideNum, animationNum) {
 		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
-		var imgs = slides[slideNum].querySelectorAll(`img[class*="ag-"]`);
-		for (var i = 0; i < imgs.length; i++) {
-			if (agClassListContains(imgs[i].classList, animationNum)) {
-				await imgs[i].decode();
-			}
-		}
 		for (var i = 0; i < goAn.length; i++) {
-			if (agClassListContains(goAn[i].classList,animationNum)) {
+			if (agClassListContains(goAn[i].classList, animationNum)) {
 				goAn[i].classList.remove("hide");
 			} else {
 				goAn[i].classList.add("hide");
@@ -168,7 +162,8 @@ window.onload = function() {
 		var moreSlides = checkForForwardSlide(currentSlide);
 		if (moreAnimations) {
 			currentAnimation[currentSlide] += 1;
-			showCurrentState(currentSlide, currentAnimation[currentSlide]);
+			selectAnimation(currentSlide, currentAnimation[currentSlide]);
+			storeState();
 		} else if ((moreSlides)&&(!rkeydown)) {
 			currentSlide += 1;
 			showCurrentState(currentSlide, currentAnimation[currentSlide]);
@@ -203,7 +198,8 @@ window.onload = function() {
 		var moreSlides = checkForBackSlide(currentSlide);
 		if (moreAnimations) {
 			currentAnimation[currentSlide] -= 1;
-			showCurrentState(currentSlide, currentAnimation[currentSlide]);
+			selectAnimation(currentSlide, currentAnimation[currentSlide]);
+			storeState();
 		} else if ((moreSlides)&&(!lkeydown)) {
 			currentSlide -= 1;
 			showCurrentState(currentSlide, currentAnimation[currentSlide]);
@@ -229,8 +225,6 @@ window.onload = function() {
 		styleSheet.type = "text/css";
 		styleSheet.innerText = styles;
 		document.head.appendChild(styleSheet);
-
-		document.body.style.visibility = 'visible';
 	}
 
 	function makeSlideNums(slides) {
@@ -250,16 +244,16 @@ window.onload = function() {
 	var currentAnimation = [];
 	var slides = document.getElementsByClassName("slide");
 
-	window.addEventListener("keydown", function(e) {
+	window.addEventListener("keydown", async function(e) {
 		switch(e.code) {
 			case "ArrowRight":
-				moveForwardOne(rkeydown);
+				await moveForwardOne(rkeydown);
 				if (!e.shiftKey) {
 					rkeydown = true;
 				};
 				break;
 			case "ArrowLeft":
-				moveBackOne(lkeydown);
+				await moveBackOne(lkeydown);
 				if (!e.shiftKey) {
 					lkeydown = true
 				};
@@ -278,6 +272,8 @@ window.onload = function() {
 		}
 	})
 
+	preDecodeImages();
+
 	makeSlideNums(slides);
 
 	setStyles();
@@ -285,4 +281,6 @@ window.onload = function() {
 	loadState();
 
 	showCurrentState();
+
+	styleSheetInit.remove();
 }
