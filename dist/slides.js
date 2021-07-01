@@ -1,7 +1,7 @@
 var styleSheetInit = document.createElement("style");
 styleSheetInit.type = "text/css";
 styleSheetInit.innerText = `
-	html {
+	.slide * {
 		visibility: hidden;
 	}
 	`;
@@ -18,7 +18,6 @@ if (!Element.prototype.requestFullscreen) {
 }
 /// End licensed material
 
-
 var styles = `
 	body {
 		font-size: calc(.25 * min(16vh, 9vw));
@@ -33,6 +32,7 @@ var styles = `
 		background-color: black;
 	}
 	.slide {
+		image-rendering: optimizeQuality;
 		position: relative;
 		padding: 0em 2em;
 		box-sizing: border-box;
@@ -53,17 +53,25 @@ var styles = `
 	}
 `;
 
+var styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
+
 window.onload = function() {
-	async function preDecodeImages() {
-		var imgs = document.getElementsByTagName("IMG");
-		for (var i = 0; i < imgs.length; i++) {
-			await imgs[i].decode();
+	function makeSlideNums(slides) {
+		for (var i = 0; i < slides.length; i++) {
+			currentAnimation.push(0);
+			var slideNum = document.createElement("P");
+			slideNum.innerHTML = String(i);
+			slides[i].appendChild(slideNum);
+			slideNum.classList.add("slide-number");
 		}
 	}
 
-	function storeState() {
-		sessionStorage.setItem("currentSlide", currentSlide);
-		sessionStorage.setItem("currentAnimation", JSON.stringify(currentAnimation));
+	function storeState(slideNum, animationNums) {
+		sessionStorage.setItem("currentSlide", slideNum);
+		sessionStorage.setItem("currentAnimation", JSON.stringify(animationNums));
 	}
 
 	function loadState() {
@@ -102,41 +110,6 @@ window.onload = function() {
 		return (maxAnimation);
 	}
 
-	/////////////////////////////////////////////////////////////////////////
-	function showCurrentState() {
-		selectAnimation(currentSlide, currentAnimation[currentSlide]);
-		selectSlide(currentSlide);
-		storeState();
-	}
-
-	function selectSlide(slideNum) {
-		for (var i = 0; i < slides.length; i++) {
-			slides[i].classList.add("hide");
-		}
-		slides[slideNum].classList.remove("hide");
-	}
-
-	function selectAnimation(slideNum, animationNum) {
-		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
-		for (var i = 0; i < goAn.length; i++) {
-			if (agClassListContains(goAn[i].classList, animationNum)) {
-				goAn[i].classList.remove("hide");
-			} else {
-				goAn[i].classList.add("hide");
-			}
-		}
-
-		var stayAn = slides[slideNum].querySelectorAll(`[class*="as-"]`);
-		for (var i = 0; i < stayAn.length; i++) {
-			stayAn[i].classList.add("hide");
-			for (var j = 0; j < animationNum + 1; j++) {
-				if (asClassListContains(stayAn[i].classList, j)) {
-					stayAn[i].classList.remove("hide");
-				}
-			}
-		}
-	}
-
 	function agClassListContains(classList, number) {
 		var expr = new RegExp(`^ag(-[0-9]+)*-${number}((-[0-9]*)|$)+`);
 		for (var i = 0; i < classList.length; i++) {
@@ -157,17 +130,11 @@ window.onload = function() {
 		return false;
 	}
 
-	function moveForwardOne(rkeydown) {
-		var moreAnimations = checkForForwardAnimation(currentSlide, currentAnimation[currentSlide]);
-		var moreSlides = checkForForwardSlide(currentSlide);
-		if (moreAnimations) {
-			currentAnimation[currentSlide] += 1;
-			selectAnimation(currentSlide, currentAnimation[currentSlide]);
-			storeState();
-		} else if ((moreSlides)&&(!rkeydown)) {
-			currentSlide += 1;
-			showCurrentState(currentSlide, currentAnimation[currentSlide]);
+	function checkForForwardSlide(slideNum) {
+		if ((slideNum + 1) < slides.length) {
+			return (true);
 		}
+		return (false);
 	}
 
 	function checkForForwardAnimation(slideNum, animationNum) {
@@ -186,26 +153,6 @@ window.onload = function() {
 		return (false);
 	}
 
-	function checkForForwardSlide(slideNum) {
-		if ((slideNum + 1) < slides.length) {
-			return (true);
-		}
-		return (false);
-	}
-
-	function moveBackOne(lkeydown) {
-		var moreAnimations = checkForBackAnimation(currentSlide, currentAnimation[currentSlide]);
-		var moreSlides = checkForBackSlide(currentSlide);
-		if (moreAnimations) {
-			currentAnimation[currentSlide] -= 1;
-			selectAnimation(currentSlide, currentAnimation[currentSlide]);
-			storeState();
-		} else if ((moreSlides)&&(!lkeydown)) {
-			currentSlide -= 1;
-			showCurrentState(currentSlide, currentAnimation[currentSlide]);
-		}
-	}
-
 	function checkForBackAnimation(slideNum, animationNum) {
 		if ((animationNum) > 0) {
 			return (true);
@@ -220,21 +167,135 @@ window.onload = function() {
 		return (false);
 	}
 
-	function setStyles() {
-		var styleSheet = document.createElement("style");
-		styleSheet.type = "text/css";
-		styleSheet.innerText = styles;
-		document.head.appendChild(styleSheet);
+	/////////////////////////////////////////////////////////////////////////
+	function selectAnimation(slideNum, animationNum) {
+		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
+		var stayAn = slides[slideNum].querySelectorAll(`[class*="as-"]`);
+		for (var i = 0; i < goAn.length; i++) {
+			if (agClassListContains(goAn[i].classList, animationNum)) {
+				goAn[i].classList.remove('hide');
+			} else {
+				goAn[i].classList.add('hide');
+			}
+		}
+		for (var i = 0; i < stayAn.length; i++) {
+			stayAn[i].classList.add('hide');
+			for (var j = 0; j < animationNum + 1; j++) {
+				if (asClassListContains(stayAn[i].classList, j)) {
+					stayAn[i].classList.remove('hide');
+				}
+			}
+		}
+		return new Promise((resolve, reject) => {
+			resolve();
+		})
 	}
 
-	function makeSlideNums(slides) {
+	function selectSlide(slideNum) {
 		for (var i = 0; i < slides.length; i++) {
-			currentAnimation.push(0);
-			var slideNum = document.createElement("P");
-			slideNum.innerHTML = String(i);
-			slides[i].appendChild(slideNum);
-			slideNum.classList.add("slide-number");
+			slides[i].classList.add("hide");
 		}
+		slides[slideNum].classList.remove("hide");
+		return new Promise((resolve, reject) => {
+			resolve();
+		})
+	}
+
+	function moveForwardOne(rkeydown) {
+		var moreAnimations = checkForForwardAnimation(currentSlide, currentAnimation[currentSlide]);
+		var moreSlides = checkForForwardSlide(currentSlide);
+		if (moreAnimations) {
+			currentAnimation[currentSlide] += 1;
+			return decodeAnimationImages(currentSlide, currentAnimation[currentSlide]).then(() => {
+				selectAnimation(currentSlide, currentAnimation[currentSlide]);
+				storeState(currentSlide, currentAnimation);
+			});
+		} else if ((moreSlides)&&(!rkeydown)) {
+			currentSlide += 1;
+			return decodeNonAnimationImages(currentSlide).then(() => {
+				decodeAnimationImages(currentSlide, currentAnimation[currentSlide]).then(() => {
+					selectAnimation(currentSlide, currentAnimation[currentSlide]).then(() => {
+						selectSlide(currentSlide);
+						storeState(currentSlide, currentAnimation);
+					});
+				})
+			});
+		} else {
+			return new Promise((res, rej) => {
+				res();
+			})
+		}
+	}
+
+	function moveBackOne(lkeydown) {
+		var moreAnimations = checkForBackAnimation(currentSlide, currentAnimation[currentSlide]);
+		var moreSlides = checkForBackSlide(currentSlide);
+		if (moreAnimations) {
+			currentAnimation[currentSlide] -= 1;
+			return decodeAnimationImages(currentSlide, currentAnimation[currentSlide]).then(() => {
+				selectAnimation(currentSlide, currentAnimation[currentSlide]);
+				storeState(currentSlide, currentAnimation);
+			});
+		} else if ((moreSlides)&&(!lkeydown)) {
+			currentSlide -= 1;
+			return decodeNonAnimationImages(currentSlide).then(() => {
+				decodeAnimationImages(currentSlide, currentAnimation[currentSlide]).then(() => {
+					selectAnimation(currentSlide, currentAnimation[currentSlide]).then(() => {
+						selectSlide(currentSlide);
+						storeState(currentSlide, currentAnimation);
+					});
+				})
+			});
+		} else {
+			return new Promise((res, rej) => {
+				res();
+			})
+		}
+	}
+
+	function decodeAnimationImages(slideNum, animationNum) {
+		var goAn = slides[slideNum].querySelectorAll(`[class*="ag-"]`);
+		var stayAn = slides[slideNum].querySelectorAll(`[class*="as-"]`);
+		var promises = [];
+		for (var i = 0; i < goAn.length; i++) {
+			if (agClassListContains(goAn[i].classList, animationNum)) {
+				var subImgs = goAn[i].getElementsByTagName("img");
+				for (var j = 0; j < subImgs.length; j++) {
+					promises.push(subImgs[j].decode());
+				}
+				if (goAn[i].tagName == "IMG") {
+					console.log(goAn[i].complete);
+					promises.push(goAn[i].decode());
+				}
+			}
+		}
+		for (var i = 0; i < stayAn.length; i++) {
+			if (asClassListContains(stayAn[i].classList, animationNum)) {
+				var subImgs = stayAn[i].getElementsByTagName("img");
+				for (var j = 0; j < subImgs.length; j++) {
+					promises.push(subImgs[j].decode());
+				}
+				if (stayAn[i].tagName == "IMG") {
+					promises.push(stayAn[i].decode());
+				}
+			}
+		}
+		return Promise.all(promises);
+	}
+
+	function decodeNonAnimationImages(slideNum) {
+		var imgs = slides[slideNum].querySelectorAll(`img:not([class*="ag-"]):not([class*="as-"])`);
+		var promises = [];
+		for (var i = 0; i < imgs.length; i++) {
+			promises.push(imgs[i].decode());
+		}
+		return Promise.all(promises);
+	}
+
+	function showCurrentState() {
+		selectAnimation(currentSlide, currentAnimation[currentSlide]).then(() => {
+			selectSlide(currentSlide);
+		})
 	}
 
 	var lkeydown = false;
@@ -244,25 +305,37 @@ window.onload = function() {
 	var currentAnimation = [];
 	var slides = document.getElementsByClassName("slide");
 
-	window.addEventListener("keydown", async function(e) {
+	var keyDownHandler = function(e) {
 		switch(e.code) {
 			case "ArrowRight":
-				await moveForwardOne(rkeydown);
+				window.removeEventListener('keydown', keyDownHandler);
+				moveForwardOne(rkeydown).then(() => {
+					window.addEventListener('keydown', keyDownHandler);
+				});
 				if (!e.shiftKey) {
 					rkeydown = true;
 				};
 				break;
 			case "ArrowLeft":
-				await moveBackOne(lkeydown);
+				window.removeEventListener('keydown', keyDownHandler);
+				moveBackOne(lkeydown).then(() => {
+					window.addEventListener('keydown', keyDownHandler);
+				});
 				if (!e.shiftKey) {
-					lkeydown = true
+					lkeydown = true;
 				};
 				break;
 			case "KeyF":
-				document.documentElement.requestFullscreen();
+				if (document.fullscreenElement) {
+					document.exitFullscreen();
+				} else {
+					document.documentElement.requestFullscreen();
+				}
 				break;
 		}
-	})
+	}
+
+	window.addEventListener("keydown", keyDownHandler);
 
 	window.addEventListener("keyup", function(e) {
 		if (e.keyCode == 39) {
@@ -272,11 +345,7 @@ window.onload = function() {
 		}
 	})
 
-	preDecodeImages();
-
 	makeSlideNums(slides);
-
-	setStyles();
 
 	loadState();
 
