@@ -70,16 +70,20 @@ window.onload = function() {
 	}
 
 	function storeState(slideNum, animationNums) {
-		sessionStorage.setItem("currentSlide", slideNum);
-		sessionStorage.setItem("currentAnimation", JSON.stringify(animationNums));
+		if (sessionStorage) {
+			sessionStorage.setItem("currentSlide", slideNum);
+			sessionStorage.setItem("currentAnimation", JSON.stringify(animationNums));
+		}
 	}
 
 	function loadState() {
-		var oldCurrentSlide = parseInt(sessionStorage.getItem("currentSlide"));
-		var oldCurrentAnimation = JSON.parse(sessionStorage.getItem("currentAnimation"));
-		if (!(oldCurrentSlide === null) && !(oldCurrentAnimation === null)) {
-			currentSlide = mergeSlides(oldCurrentSlide);
-			currentAnimation = maxOutAnimations(currentSlide, oldCurrentAnimation);
+		if (sessionStorage) {
+			var oldCurrentSlide = parseInt(sessionStorage.getItem("currentSlide"));
+			var oldCurrentAnimation = JSON.parse(sessionStorage.getItem("currentAnimation"));
+			if (!(oldCurrentSlide === null) && !(oldCurrentAnimation === null)) {
+				currentSlide = mergeSlides(oldCurrentSlide);
+				currentAnimation = maxOutAnimations(currentSlide, oldCurrentAnimation);
+			}
 		}
 	}
 
