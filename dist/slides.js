@@ -47,9 +47,13 @@ var styles = `
 	}
 	.slide-number {
 		position: absolute;
-		bottom: 0;
-		right: 1.5em;
-		text-align: right;
+		left: 50%;
+		right: 50%;
+		bottom: .3em;
+		padding: .1em;
+		margin: 0em;
+		text-align: center;
+		line-height: 1em;
 	}
 `;
 
@@ -63,9 +67,8 @@ window.onload = function() {
 		for (var i = 0; i < slides.length; i++) {
 			currentAnimation.push(0);
 			var slideNum = document.createElement("P");
-			slideNum.innerHTML = String(i);
-			slides[i].appendChild(slideNum);
 			slideNum.classList.add("slide-number");
+			slides[i].appendChild(slideNum);
 		}
 	}
 
@@ -190,6 +193,7 @@ window.onload = function() {
 				}
 			}
 		}
+		slides[slideNum].getElementsByClassName("slide-number")[0].innerHTML = String(slideNum) + "-" + String(currentAnimation[slideNum]);
 		return new Promise((resolve, reject) => {
 			resolve();
 		})
@@ -302,6 +306,22 @@ window.onload = function() {
 		})
 	}
 
+	function goToPopUp() {
+		let goToSlideAn = window.prompt("To go to slide N, animation M, enter: \n N-M", "0-0");
+		let re = new RegExp('^[0-9]+-[0-9]+$');
+		if (re.test(goToSlideAn)) {
+			let goToSlide = parseInt(goToSlideAn.split("-")[0]);
+			let goToAn = parseInt(goToSlideAn.split("-")[1]);
+			currentSlide = mergeSlides(goToSlide);
+			currentAnimation[currentSlide] = goToAn;
+			currentAnimation = maxOutAnimations(currentSlide, currentAnimation);
+			showCurrentState();
+		} else if (!(goToSlideAn == null)) {
+			alert("Make sure you format your input as N-M, \nwhere N is the slide number and M is the animation number.")
+			goToPopUp();
+		}
+	}
+
 	var lkeydown = false;
 	var rkeydown = false;
 
@@ -336,6 +356,8 @@ window.onload = function() {
 					document.documentElement.requestFullscreen();
 				}
 				break;
+			case "KeyG":
+				goToPopUp();
 		}
 	}
 
