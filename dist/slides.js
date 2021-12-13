@@ -47,10 +47,10 @@ var styles = `
 	}
 	.slide-number {
 		position: absolute;
-		left: 50%;
-		right: 50%;
+		left: 0px;
+		right: 0px;
 		bottom: .3em;
-		padding: .1em;
+		padding: 0px;
 		margin: 0em;
 		text-align: center;
 		line-height: 1em;
